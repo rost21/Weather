@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical"
+    tools:context="com.example.wheatherapp.AddLocationActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        android:padding="@dimen/_16sdp">
+
+        <AutoCompleteTextView
+            android:id="@+id/new_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bottom_border"
+            android:hint="@string/location_hints"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:padding="@dimen/_12sdp"
+            android:singleLine="true"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_12sdp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:text="@string/location_example"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_10sdp" />
+
+        <Button
+            android:id="@+id/add_location_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:background="#fff"
+            android:padding="@dimen/_12sdp"
+            android:text="@string/add_new_location"
+            android:textColor="@color/colorBackground" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical"
+        android:padding="@dimen/_16sdp">
+
+        <Button
+            android:id="@+id/go_to_location_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_32sdp"
+            android:background="#fff"
+            android:padding="@dimen/_12sdp"
+            android:text="@string/go_to_location"
+            android:textColor="@color/colorBackground" />
+
+    </LinearLayout>
+
+</LinearLayout>

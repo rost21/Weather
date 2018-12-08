@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">WheatherApp</string>
+    <string name="city_country"> -- </string>
+    <string name="date_today"> -- </string>
+    <string name="current_temperature"> -- </string>
+    <string name="weather_information"> -- </string>
+    <string name="temp_information"> -- </string>
+    <string name="wind">Wind</string>
+    <string name="wind_speed">-- km/h</string>
+    <string name="humidity">Humidity</string>
+    <string name="humidity_rate">--%</string>
+    <string name="day_of_week">--</string>
+    <string name="location_hints">Type city or postcode</string>
+    <string name="location_example">Example London,GB</string>
+    <string name="add_new_location">Add new location</string>
+    <string name="stored_location">You can store only 5 locations</string>
+    <string name="permission_notice">This permission is important, but you can set your location on LOCATION PAGE</string>
+    <string name="go_to_location">Go to location settings</string>
+</resources>
