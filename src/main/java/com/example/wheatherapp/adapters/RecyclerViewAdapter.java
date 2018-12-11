@@ -35,11 +35,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
         holder.dayOfWeek.setText(dailyWeather.get(position).getDay());
         holder.weatherIcon.setImageResource(dailyWeather.get(position).getWeatherIcon());
 
-        double mTemp = Double.parseDouble(dailyWeather.get(position).getWeatherResult());
-        holder.weatherResult.setText(String.valueOf(Math.round(mTemp)) + "°");
+        double mTempMin = Double.parseDouble(dailyWeather.get(position).getWeatherResult());
+        holder.weatherResult.setText(String.valueOf(Math.round(mTempMin)) + "°");
 
-        holder.weatherResultSmall.setText(dailyWeather.get(position).getWeatherResultSmall());
-        holder.weatherResultSmall.setVisibility(View.GONE);
+        double mTempMax = Double.parseDouble(dailyWeather.get(position).getWeatherResultSmall());
+        holder.weatherResultSmall.setText(String.valueOf(Math.round(mTempMax)) + "°");
+        //holder.weatherResultSmall.setText(dailyWeather.get(position).getWeatherResultSmall());
+        //holder.weatherResultSmall.setVisibility(View.GONE);
     }
 
     @Override

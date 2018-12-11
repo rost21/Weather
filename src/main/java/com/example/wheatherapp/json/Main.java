@@ -1,6 +1,7 @@
 package com.example.wheatherapp.json;
 
 public class Main {
+
     private String temp;
     private String pressure;
     private String humidity;

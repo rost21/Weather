@@ -1,6 +1,7 @@
 package com.example.wheatherapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,13 +28,17 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.example.wheatherapp.json.Sys;
 import com.example.wheatherapp.json.Weather;
+import com.example.wheatherapp.json.WeatherResults;
 import com.github.pavlospt.CircleView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,6 +51,8 @@ import com.example.wheatherapp.json.FiveDaysForecast;
 import com.example.wheatherapp.json.FiveWeathers;
 import com.example.wheatherapp.json.Forecast;
 import com.example.wheatherapp.json.LocationMapObject;
+
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,13 +60,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
 public class WeatherActivity extends AppCompatActivity implements LocationListener {
     private static final String TAG = WeatherActivity.class.getSimpleName();
     private RecyclerView recyclerView;
     private TextView cityCountry;
     private TextView currentDate;
     private ImageView weatherImage;
-    private CircleView circleTitle;
     private TextView windResult;
     private TextView humidityResult;
     private RequestQueue queue;
@@ -76,13 +83,14 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
     private TextView result_sunrise;
     private TextView result_sunset;
     private FiveDaysForecast fiveDaysForecast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
+        if (actionBar != null) {
             actionBar.hide();
         }
         queue = Volley.newRequestQueue(this);
@@ -92,29 +100,30 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
         cityCountry = findViewById(R.id.city_country);
         currentDate = findViewById(R.id.current_date);
         weatherImage = findViewById(R.id.weather_icon);
+
         windResult = findViewById(R.id.wind_result);
         humidityResult = findViewById(R.id.humidity_result);
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(WeatherActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         } else {
-            if(isLocationSaved.equals("")){
+            if (isLocationSaved.equals("")) {
                 // make API call with longitude and latitude
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
                 if (locationManager != null) {
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    apiUrl = "http://api.openweathermap.org/data/2.5/weather?lat="+location.getLatitude()+"&lon="+location.getLongitude()+"&APPID=62f6de3f7c0803216a3a13bbe4ea9914&units=metric";
+                    apiUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + location.getLatitude() + "&lon=" + location.getLongitude() + "&APPID=62f6de3f7c0803216a3a13bbe4ea9914&units=metric";
                     makeJsonObject(apiUrl);
                 }
-            }else {
+            } else {
                 // make API call with city name
                 String storedCityName = sharedPreference.getLocationInPreference();
                 //String storedCityName = "Enugu";
                 System.out.println("Stored city " + storedCityName);
                 String[] city = storedCityName.split(",");
-                if(!TextUtils.isEmpty(city[0])){
+                if (!TextUtils.isEmpty(city[0])) {
                     System.out.println("Stored city " + city[0]);
-                    String url ="http://api.openweathermap.org/data/2.5/weather?q="+city[0]+"&APPID=62f6de3f7c0803216a3a13bbe4ea9914&units=metric";
+                    String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city[0] + "&APPID=62f6de3f7c0803216a3a13bbe4ea9914&units=metric";
                     makeJsonObject(url);
                 }
             }
@@ -124,7 +133,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
         result_sunrise = findViewById(R.id.sunrise);
         result_sunset = findViewById(R.id.sunset);
 
-        ImageButton addLocation =  findViewById(R.id.add_location);
+        ImageButton addLocation = findViewById(R.id.add_location);
         addLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,7 +142,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
             }
         });
         recyclerView = findViewById(R.id.weather_daily_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
     }
 
@@ -152,7 +161,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
     }
 
 
-    private void makeJsonObject(final String apiUrl){
+    private void makeJsonObject(final String apiUrl) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, apiUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -176,7 +185,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
                     String sunsetValue = locationMapObject.getSys().getSunset();
 
                     //save location in database
-                    if(apiUrl.contains("lat")){
+                    if (apiUrl.contains("lat")) {
                         query.insertNewLocation(locationMapObject.getName());
                     }
                     // populate View data
@@ -184,16 +193,25 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
                     currentDate.setText(Html.fromHtml(todayDate));
                     result_city.setText(Html.fromHtml(weatherTemp).toString());
                     result_description.setText(Html.fromHtml(weatherDescription).toString());
+
+                    //weatherImage.setImageResource(R.drawable.sun);
                     windResult.setText(Html.fromHtml(windSpeed) + " km/h");
                     humidityResult.setText(Html.fromHtml(humidityValue) + " %");
 
-                    SimpleDateFormat format = new SimpleDateFormat("HH:mm",Locale.US);
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.US);
                     format.setTimeZone(java.util.TimeZone.getDefault());
 
-                    String sunrise = format.format(new Date(Long.parseLong(sunriseValue)*1000L));
-                    String sunset = format.format(new Date(Long.parseLong(sunsetValue)*1000L));
+                    String sunrise = format.format(new Date(Long.parseLong(sunriseValue) * 1000L));
+                    String sunset = format.format(new Date(Long.parseLong(sunsetValue) * 1000L));
+
+
                     result_sunrise.setText(sunrise);
                     result_sunset.setText(sunset);
+
+                    String icon = locationMapObject.getWeather().get(0).getIcon();
+                    String load = "http://openweathermap.org/img/w/" + icon + ".png";
+                    Glide.with(getApplicationContext()).load(load).into(weatherImage);
+                    //System.out.print(getImage(weatherDescription,sunrise,sunset));
 
                     fiveDaysApiJsonObjectCall(locationMapObject.getName());
                 }
@@ -207,6 +225,41 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
         queue.add(stringRequest);
     }
 
+    public int getImage(String description, String sunrise, String sunset) {
+
+
+        String sr[] = sunrise.split(":");
+        String tempSR = sr[0];
+        Integer sunriseToday = Integer.parseInt(tempSR);
+        System.out.print(sunriseToday);
+
+        String ss[] = sunset.split(":");
+        String tempSS = ss[0];
+        Integer sunsetToday = Integer.parseInt(tempSS);
+        System.out.print(sunsetToday);
+
+
+        DateFormat df = new SimpleDateFormat("HH");
+        String date = df.format(Calendar.getInstance().getTime());
+        Integer nowHour = Integer.parseInt(date);
+        System.out.print(nowHour);
+
+        String str = "";
+        if (nowHour > sunriseToday && nowHour < sunsetToday) {
+            str = "day";
+            if (description.contains("overcast clouds")) {
+                return R.drawable.cloud;
+            }
+        } else {
+            str = "night";
+
+        }
+
+
+        return 0;
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_LOCATION) {
@@ -217,14 +270,14 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        apiUrl = "http://api.openweathermap.org/data/2.5/weather?lat="+location.getLatitude()+"&lon="+location.getLongitude()+"&APPID="+Helper.API_KEY+"&units=metric";
+                        apiUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + location.getLatitude() + "&lon=" + location.getLongitude() + "&APPID=" + Helper.API_KEY + "&units=metric";
                         makeJsonObject(apiUrl);
-                    }else{
-                        apiUrl = "http://api.openweathermap.org/data/2.5/weather?lat=51.5074&lon=0.1278&APPID="+Helper.API_KEY+"&units=metric";
+                    } else {
+                        apiUrl = "http://api.openweathermap.org/data/2.5/weather?lat=46.48&lon=30.73&APPID=" + Helper.API_KEY + "&units=metric";
                         makeJsonObject(apiUrl);
                     }
                 }
-            }else{
+            } else {
                 Toast.makeText(WeatherActivity.this, getString(R.string.permission_notice), Toast.LENGTH_LONG).show();
             }
         }
@@ -252,6 +305,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     private void showGPSDisabledAlertToUser() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
@@ -268,18 +322,23 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
             }
         });
         AlertDialog alert = alertDialogBuilder.create();
+
         alert.show();
+        alert.getButton(alert.BUTTON_POSITIVE).setTextColor(R.color.colorPrimaryDark);
+        alert.getButton(alert.BUTTON_NEGATIVE).setTextColor(R.color.colorPrimaryDark);
     }
 
-    private String getTodayDateInStringFormat(){
+    private String getTodayDateInStringFormat() {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("E, d MMMM", Locale.US);
         return df.format(c.getTime());
     }
 
-    private void fiveDaysApiJsonObjectCall(String city){
-        String apiUrl = "http://api.openweathermap.org/data/2.5/forecast?q="+city+ "&APPID="+Helper.API_KEY+"&units=metric";
-        final List<WeatherObject> daysOfTheWeek = new ArrayList<WeatherObject>();
+    private void fiveDaysApiJsonObjectCall(String city) {
+        String apiUrl = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&APPID=" + Helper.API_KEY + "&units=metric";
+        final ImageView weather_icon = findViewById(R.id.weather_icon);
+
+        final List<WeatherObject> daysOfTheWeek = new ArrayList<>();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, apiUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -287,52 +346,58 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
                 GsonBuilder builder = new GsonBuilder();
                 Gson gson = builder.create();
                 Forecast forecast = gson.fromJson(response, Forecast.class);
+
                 if (null == forecast) {
                     Toast.makeText(getApplicationContext(), "Nothing was returned", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Response Good", Toast.LENGTH_LONG).show();
 
-                    int[] everyday = new int[]{0,0,0,0,0,0,0};
+                    int[] everyday = new int[]{0, 0, 0, 0, 0, 0, 0};
 
                     List<FiveWeathers> weatherInfo = forecast.getList();
-                    if(null != weatherInfo){
-                        for(int i = 0; i < weatherInfo.size(); i++){
+
+                    if (null != weatherInfo) {
+                        for (int i = 0; i < weatherInfo.size(); i++) {
+
                             String time = weatherInfo.get(i).getDt_txt();
                             String shortDay = convertTimeToDay(time);
-                            String temp = weatherInfo.get(i).getMain().getTemp();
                             String tempMin = weatherInfo.get(i).getMain().getTemp_min();
+                            String tempMax = weatherInfo.get(i).getMain().getTemp_max();
+                            //System.out.print(description);
+                            //
+                            //String icon = weatherInfo.get(i).getConditions().get(i).getIcon();
+                            //System.out.print(icon);
 
-                            if(convertTimeToDay(time).equals("Mon") && everyday[0] < 1){
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, temp, tempMin));
+                            if (convertTimeToDay(time).equals("Mon") && everyday[0] < 1) {
+                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
                                 everyday[0] = 1;
                             }
-                            if(convertTimeToDay(time).equals("Tue") && everyday[1] < 1){
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, temp, tempMin));
+                            if (convertTimeToDay(time).equals("Tue") && everyday[1] < 1) {
+                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
                                 everyday[1] = 1;
                             }
-                            if(convertTimeToDay(time).equals("Wed") && everyday[2] < 1){
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, temp, tempMin));
+                            if (convertTimeToDay(time).equals("Wed") && everyday[2] < 1) {
+                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
                                 everyday[2] = 1;
                             }
-                            if(convertTimeToDay(time).equals("Thu") && everyday[3] < 1){
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, temp, tempMin));
+                            if (convertTimeToDay(time).equals("Thu") && everyday[3] < 1) {
+                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
                                 everyday[3] = 1;
                             }
-                            if(convertTimeToDay(time).equals("Fri") && everyday[4] < 1){
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, temp, tempMin));
+                            if (convertTimeToDay(time).equals("Fri") && everyday[4] < 1) {
+                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
                                 everyday[4] = 1;
                             }
-                            if(convertTimeToDay(time).equals("Sat") && everyday[5] < 1){
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, temp, tempMin));
+                            if (convertTimeToDay(time).equals("Sat") && everyday[5] < 1) {
+                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
                                 everyday[5] = 1;
                             }
-                            if(convertTimeToDay(time).equals("Sun") && everyday[6] < 1){
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, temp, tempMin));
+                            if (convertTimeToDay(time).equals("Sun") && everyday[6] < 1) {
+                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
                                 everyday[6] = 1;
                             }
-                            recyclerView.setAdapter(new RecyclerViewAdapter(WeatherActivity.this,daysOfTheWeek));
-                            //= new RecyclerViewAdapter(WeatherActivity.this, daysOfTheWeek);
-                            //recyclerView.setAdapter(recyclerViewAdapter);
+                            recyclerView.setAdapter(new RecyclerViewAdapter(WeatherActivity.this, daysOfTheWeek));
+
                         }
                     }
                 }
@@ -346,7 +411,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
         queue.add(stringRequest);
     }
 
-    private String convertTimeToDay(String time){
+    private String convertTimeToDay(String time) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:SSSS", Locale.US);
         String days = "";
         try {
