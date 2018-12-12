@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.example.wheatherapp.R;
 import com.example.wheatherapp.entity.WeatherObject;
 
@@ -31,17 +32,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerViewHolders holder, int position) {
-
+        String load = "http://openweathermap.org/img/w/" + dailyWeather.get(position).getWeatherIcon() + ".png";
         holder.dayOfWeek.setText(dailyWeather.get(position).getDay());
-        holder.weatherIcon.setImageResource(dailyWeather.get(position).getWeatherIcon());
+        Glide.with(context).load(load).into(holder.weatherIcon);
 
-        double mTempMin = Double.parseDouble(dailyWeather.get(position).getWeatherResult());
+        double mTempMin = Double.parseDouble(dailyWeather.get(position).getTemp());
         holder.weatherResult.setText(String.valueOf(Math.round(mTempMin)) + "°");
 
-        double mTempMax = Double.parseDouble(dailyWeather.get(position).getWeatherResultSmall());
-        holder.weatherResultSmall.setText(String.valueOf(Math.round(mTempMax)) + "°");
-        //holder.weatherResultSmall.setText(dailyWeather.get(position).getWeatherResultSmall());
-        //holder.weatherResultSmall.setVisibility(View.GONE);
+
     }
 
     @Override

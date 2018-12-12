@@ -1,11 +1,14 @@
 package com.example.wheatherapp.json;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class FiveWeathers {
 
     private String dt_txt;
     private Main main;
+    @SerializedName("weather")
     private List<WeatherResults> conditions;
 
     public FiveWeathers(String dt_txt, Main main, List<WeatherResults> conditions) {
@@ -22,7 +25,7 @@ public class FiveWeathers {
         return main;
     }
 
-    public List<WeatherResults> getConditions() {
-        return conditions;
+    public WeatherResults getConditions() {
+        return conditions.get(0);
     }
 }

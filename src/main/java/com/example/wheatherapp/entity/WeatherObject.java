@@ -2,30 +2,25 @@ package com.example.wheatherapp.entity;
 
 public class WeatherObject {
     private String day;
-    private int weatherIcon;
-    private String weatherResult;
-    private String weatherResultSmall;
+    private String weatherIcon;
+    private String temp;
 
-    public WeatherObject(String day, int weatherIcon, String weatherResult, String weatherResultSmall) {
+    public WeatherObject(String day, String weatherIcon, String temp) {
         this.day = day;
         this.weatherIcon = weatherIcon;
-        this.weatherResult = weatherResult;
-        this.weatherResultSmall = weatherResultSmall;
+        this.temp = temp;
     }
 
     public String getDay() {
         return day;
     }
 
-    public int getWeatherIcon() {
+    public String getWeatherIcon() {
         return weatherIcon;
     }
 
-    public String getWeatherResult() {
-        return weatherResult;
+    public String getTemp() {
+        return temp;
     }
 
-    public String getWeatherResultSmall() {
-        return weatherResultSmall;
-    }
 }

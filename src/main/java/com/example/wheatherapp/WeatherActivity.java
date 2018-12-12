@@ -211,7 +211,6 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
                     String icon = locationMapObject.getWeather().get(0).getIcon();
                     String load = "http://openweathermap.org/img/w/" + icon + ".png";
                     Glide.with(getApplicationContext()).load(load).into(weatherImage);
-                    //System.out.print(getImage(weatherDescription,sunrise,sunset));
 
                     fiveDaysApiJsonObjectCall(locationMapObject.getName());
                 }
@@ -359,46 +358,47 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
                     if (null != weatherInfo) {
                         for (int i = 0; i < weatherInfo.size(); i++) {
 
+
                             String time = weatherInfo.get(i).getDt_txt();
-                            String shortDay = convertTimeToDay(time);
-                            String tempMin = weatherInfo.get(i).getMain().getTemp_min();
-                            String tempMax = weatherInfo.get(i).getMain().getTemp_max();
-                            //System.out.print(description);
-                            //
-                            //String icon = weatherInfo.get(i).getConditions().get(i).getIcon();
-                            //System.out.print(icon);
 
-                            if (convertTimeToDay(time).equals("Mon") && everyday[0] < 1) {
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
-                                everyday[0] = 1;
-                            }
-                            if (convertTimeToDay(time).equals("Tue") && everyday[1] < 1) {
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
-                                everyday[1] = 1;
-                            }
-                            if (convertTimeToDay(time).equals("Wed") && everyday[2] < 1) {
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
-                                everyday[2] = 1;
-                            }
-                            if (convertTimeToDay(time).equals("Thu") && everyday[3] < 1) {
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
-                                everyday[3] = 1;
-                            }
-                            if (convertTimeToDay(time).equals("Fri") && everyday[4] < 1) {
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
-                                everyday[4] = 1;
-                            }
-                            if (convertTimeToDay(time).equals("Sat") && everyday[5] < 1) {
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
-                                everyday[5] = 1;
-                            }
-                            if (convertTimeToDay(time).equals("Sun") && everyday[6] < 1) {
-                                daysOfTheWeek.add(new WeatherObject(shortDay, R.drawable.small_weather_icon, tempMin, tempMax));
-                                everyday[6] = 1;
-                            }
-                            recyclerView.setAdapter(new RecyclerViewAdapter(WeatherActivity.this, daysOfTheWeek));
+                            if (time.contains("12:00:00")) {
+                                String shortDay = convertTimeToDay(time);
+                                String temp = weatherInfo.get(i).getMain().getTemp();
+                                String icon = weatherInfo.get(i).getConditions().getIcon();
 
+                                if (convertTimeToDay(time).equals("Mon") && everyday[0] < 1) {
+                                    daysOfTheWeek.add(new WeatherObject(shortDay, icon, temp));
+                                    everyday[0] = 1;
+                                }
+                                if (convertTimeToDay(time).equals("Tue") && everyday[1] < 1) {
+                                    daysOfTheWeek.add(new WeatherObject(shortDay, icon, temp));
+                                    everyday[1] = 1;
+                                }
+                                if (convertTimeToDay(time).equals("Wed") && everyday[2] < 1) {
+                                    daysOfTheWeek.add(new WeatherObject(shortDay, icon, temp));
+                                    everyday[2] = 1;
+                                }
+                                if (convertTimeToDay(time).equals("Thu") && everyday[3] < 1) {
+                                    daysOfTheWeek.add(new WeatherObject(shortDay, icon, temp));
+                                    everyday[3] = 1;
+                                }
+                                if (convertTimeToDay(time).equals("Fri") && everyday[4] < 1) {
+                                    daysOfTheWeek.add(new WeatherObject(shortDay, icon, temp));
+                                    everyday[4] = 1;
+                                }
+                                if (convertTimeToDay(time).equals("Sat") && everyday[5] < 1) {
+                                    daysOfTheWeek.add(new WeatherObject(shortDay, icon, temp));
+                                    everyday[5] = 1;
+                                }
+                                if (convertTimeToDay(time).equals("Sun") && everyday[6] < 1) {
+                                    daysOfTheWeek.add(new WeatherObject(shortDay, icon, temp));
+                                    everyday[6] = 1;
+                                }
+                                recyclerView.setAdapter(new RecyclerViewAdapter(WeatherActivity.this, daysOfTheWeek));
+
+                            }
                         }
+
                     }
                 }
             }
@@ -416,11 +416,9 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
         String days = "";
         try {
             Date date = format.parse(time);
-            System.out.println("Our time " + date);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             days = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
-            System.out.println("Our time " + days);
         } catch (ParseException e) {
             e.printStackTrace();
         }
