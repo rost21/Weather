@@ -193,8 +193,6 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
                     currentDate.setText(Html.fromHtml(todayDate));
                     result_city.setText(Html.fromHtml(weatherTemp).toString());
                     result_description.setText(Html.fromHtml(weatherDescription).toString());
-
-                    //weatherImage.setImageResource(R.drawable.sun);
                     windResult.setText(Html.fromHtml(windSpeed) + " km/h");
                     humidityResult.setText(Html.fromHtml(humidityValue) + " %");
 
@@ -203,7 +201,6 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
 
                     String sunrise = format.format(new Date(Long.parseLong(sunriseValue) * 1000L));
                     String sunset = format.format(new Date(Long.parseLong(sunsetValue) * 1000L));
-
 
                     result_sunrise.setText(sunrise);
                     result_sunset.setText(sunset);
@@ -223,41 +220,6 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
         });
         queue.add(stringRequest);
     }
-
-    public int getImage(String description, String sunrise, String sunset) {
-
-
-        String sr[] = sunrise.split(":");
-        String tempSR = sr[0];
-        Integer sunriseToday = Integer.parseInt(tempSR);
-        System.out.print(sunriseToday);
-
-        String ss[] = sunset.split(":");
-        String tempSS = ss[0];
-        Integer sunsetToday = Integer.parseInt(tempSS);
-        System.out.print(sunsetToday);
-
-
-        DateFormat df = new SimpleDateFormat("HH");
-        String date = df.format(Calendar.getInstance().getTime());
-        Integer nowHour = Integer.parseInt(date);
-        System.out.print(nowHour);
-
-        String str = "";
-        if (nowHour > sunriseToday && nowHour < sunsetToday) {
-            str = "day";
-            if (description.contains("overcast clouds")) {
-                return R.drawable.cloud;
-            }
-        } else {
-            str = "night";
-
-        }
-
-
-        return 0;
-    }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -288,14 +250,10 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
+    public void onStatusChanged(String s, int i, Bundle bundle) {}
 
     @Override
-    public void onProviderEnabled(String s) {
-
-    }
+    public void onProviderEnabled(String s) {}
 
     @Override
     public void onProviderDisabled(String provider) {
@@ -335,7 +293,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
 
     private void fiveDaysApiJsonObjectCall(String city) {
         String apiUrl = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&APPID=" + Helper.API_KEY + "&units=metric";
-        final ImageView weather_icon = findViewById(R.id.weather_icon);
+        //final ImageView weather_icon = findViewById(R.id.weather_icon);
         final List<WeatherObject> daysOfTheWeek = new ArrayList<>();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, apiUrl, new Response.Listener<String>() {
             @Override
