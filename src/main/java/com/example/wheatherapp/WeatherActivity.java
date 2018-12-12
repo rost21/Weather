@@ -336,7 +336,6 @@ public class WeatherActivity extends AppCompatActivity implements LocationListen
     private void fiveDaysApiJsonObjectCall(String city) {
         String apiUrl = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&APPID=" + Helper.API_KEY + "&units=metric";
         final ImageView weather_icon = findViewById(R.id.weather_icon);
-
         final List<WeatherObject> daysOfTheWeek = new ArrayList<>();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, apiUrl, new Response.Listener<String>() {
             @Override
